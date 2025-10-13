@@ -1,0 +1,149 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 240 10% 3.9%;
+    --foreground: 180 100% 90%;
+
+    --card: 240 8% 8%;
+    --card-foreground: 180 100% 90%;
+
+    --popover: 240 8% 8%;
+    --popover-foreground: 180 100% 90%;
+
+    --primary: 158 100% 50%;
+    --primary-foreground: 240 10% 3.9%;
+
+    --secondary: 190 100% 50%;
+    --secondary-foreground: 240 10% 3.9%;
+
+    --muted: 240 8% 15%;
+    --muted-foreground: 180 50% 60%;
+
+    --accent: 158 100% 50%;
+    --accent-foreground: 240 10% 3.9%;
+
+    --destructive: 350 100% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 240 8% 20%;
+    --input: 240 8% 20%;
+    --ring: 158 100% 50%;
+
+    --radius: 0.75rem;
+
+    /* Custom tokens for NeuroPCB */
+    --neon-green: 158 100% 50%;
+    --neon-cyan: 190 100% 50%;
+    --neon-red: 350 100% 60%;
+    --glass-bg: 240 8% 8% / 0.6;
+    --glow-green: 158 100% 50% / 0.4;
+    --glow-cyan: 190 100% 50% / 0.4;
+    --glow-red: 350 100% 60% / 0.4;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--neon-green)), hsl(var(--neon-cyan)));
+    --gradient-alert: linear-gradient(135deg, hsl(var(--neon-red)), hsl(350 100% 45%));
+    --gradient-bg: linear-gradient(180deg, hsl(240 10% 3.9%), hsl(240 10% 6%));
+
+    /* Shadows */
+    --shadow-glow-green: 0 0 30px hsl(var(--glow-green)), 0 0 60px hsl(var(--glow-green));
+    --shadow-glow-cyan: 0 0 30px hsl(var(--glow-cyan)), 0 0 60px hsl(var(--glow-cyan));
+    --shadow-glow-red: 0 0 30px hsl(var(--glow-red)), 0 0 60px hsl(var(--glow-red));
+    --shadow-card: 0 8px 32px hsl(240 10% 3.9% / 0.5);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    background: var(--gradient-bg);
+    min-height: 100vh;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-card;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/50 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--border));
+  }
+
+  .glow-green {
+    box-shadow: var(--shadow-glow-green);
+  }
+
+  .glow-cyan {
+    box-shadow: var(--shadow-glow-cyan);
+  }
+
+  .glow-red {
+    box-shadow: var(--shadow-glow-red);
+  }
+
+  .text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out;
+}
