@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Settings, Brain, AlertTriangle, BarChart3, Info, CheckCircle, Wifi, Bluetooth, WifiOff, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Settings, Brain, AlertTriangle,BarChart3, Info, CheckCircle, Wifi, Bluetooth, WifiOff } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { cn } from './ui-components';
 
-// Navigation Component
+// Navigation Component (unchanged as requested)
 export const Navigation = () => {
   const location = useLocation();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const links = [
     { path: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -18,19 +17,7 @@ export const Navigation = () => {
   return (
     <nav className="fixed bottom-0 left-0 right-0 md:top-0 md:bottom-auto glass-card border-t md:border-b md:border-t-0 z-50">
       <div className="max-w-7xl mx-auto px-4">
-        {/* Mobile Menu Button */}
-        <div className="md:hidden flex justify-between items-center py-3">
-          <div className="text-white font-bold text-lg">Self Healing PCB</div>
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 text-gray-400 hover:text-white"
-          >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
-
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex justify-start md:gap-8 py-4">
+        <div className="flex justify-around md:justify-start md:gap-8 py-4">
           {links.map(({ path, label, icon: Icon }) => (
             <Link
               key={path}
@@ -43,40 +30,16 @@ export const Navigation = () => {
               )}
             >
               <Icon className="w-5 h-5" />
-              <span className="font-medium">{label}</span>
+              <span className="hidden md:inline font-medium">{label}</span>
             </Link>
           ))}
         </div>
-
-        {/* Mobile Navigation */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-700">
-            <div className="space-y-2">
-              {links.map(({ path, label, icon: Icon }) => (
-                <Link
-                  key={path}
-                  to={path}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={cn(
-                    'flex items-center gap-3 px-4 py-3 rounded-lg transition-all w-full',
-                    location.pathname === path
-                      ? 'bg-primary text-primary-foreground glow-green'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-card'
-                  )}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span className="font-medium">{label}</span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </nav>
   );
 };
 
-// AI Advisor Component
+// AI Advisor Component - Mobile Responsive
 export const AIAdvisor = ({ suggestion, severity }) => {
   const severityConfig = {
     low: {
@@ -134,7 +97,7 @@ export const AIAdvisor = ({ suggestion, severity }) => {
   );
 };
 
-// Connection Status Component
+// Connection Status Component - Mobile Responsive
 export const ConnectionStatus = ({ mode, isConnected }) => {
   const Icon = mode === 'BLE' ? Bluetooth : mode === 'Wi-Fi' ? Wifi : WifiOff;
   
@@ -163,7 +126,7 @@ export const ConnectionStatus = ({ mode, isConnected }) => {
   );
 };
 
-// Data Chart Component
+// Data Chart Component - Mobile Responsive
 export const DataChart = ({ data, dataKey, color, label, height = 200 }) => {
   return (
     <div className="glass-card rounded-2xl p-4 md:p-6">
@@ -206,7 +169,7 @@ export const DataChart = ({ data, dataKey, color, label, height = 200 }) => {
   );
 };
 
-// Gauge Component
+// Gauge Component - Mobile Responsive
 export const Gauge = ({ 
   value, 
   min, 
@@ -255,20 +218,22 @@ export const Gauge = ({
       container: 'w-32 h-32',
       text: 'text-2xl',
       label: 'text-xs',
-      strokeWidth: '6'
+      strokeWidth: '6',
+      padding: 'p-4'
     },
     normal: {
       container: 'w-48 h-48',
       text: 'text-4xl',
       label: 'text-sm',
-      strokeWidth: '8'
+      strokeWidth: '8',
+      padding: 'p-6'
     }
   };
 
   const config = sizeConfig[size];
 
   return (
-    <div className="glass-card rounded-2xl p-4 md:p-6 space-y-3 md:space-y-4">
+    <div className={cn('glass-card rounded-2xl space-y-3 md:space-y-4', config.padding)}>
       <div className="text-center">
         <h3 className={cn('font-medium text-muted-foreground uppercase tracking-wider', config.label)}>
           {label}
@@ -327,7 +292,7 @@ export const Gauge = ({
   );
 };
 
-// Status Card Component
+// Status Card Component - Mobile Responsive
 export const StatusCard = ({ title, value, icon, status = 'normal', subtitle, size = 'normal' }) => {
   const statusColors = {
     normal: 'border-[hsl(var(--neon-green))] text-[hsl(var(--neon-green))]',
@@ -347,14 +312,16 @@ export const StatusCard = ({ title, value, icon, status = 'normal', subtitle, si
       value: 'text-lg',
       subtitle: 'text-xs',
       icon: 'p-1 rounded',
-      iconSize: 'w-4 h-4'
+      iconSize: 'w-4 h-4',
+      padding: 'p-3'
     },
     normal: {
       title: 'text-xs',
       value: 'text-2xl',
       subtitle: 'text-xs',
       icon: 'p-2 rounded-lg',
-      iconSize: 'w-6 h-6'
+      iconSize: 'w-6 h-6',
+      padding: 'p-4'
     }
   };
 
@@ -362,9 +329,10 @@ export const StatusCard = ({ title, value, icon, status = 'normal', subtitle, si
 
   return (
     <div className={cn(
-      'glass-card rounded-xl p-3 md:p-4 border-l-4 transition-all duration-300',
+      'glass-card rounded-xl border-l-4 transition-all duration-300',
       statusColors[status],
-      status !== 'normal' && glowColors[status]
+      status !== 'normal' && glowColors[status],
+      config.padding
     )}>
       <div className="flex items-start justify-between">
         <div className="flex-1">

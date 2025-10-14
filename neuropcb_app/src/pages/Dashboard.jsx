@@ -225,114 +225,221 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Side - Simulation Controls */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Simulation Control Panel */}
-              <div className="glass-card rounded-2xl p-4 md:p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg md:text-xl font-semibold text-white">Hardware Analysis</h2>
-                  <div className="hidden md:flex items-center gap-3">
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      showManualInput 
-                        ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' 
-                        : isSimulationRunning 
-                        ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
-                        : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
-                    }`}>
-                      {showManualInput ? 'Manual Mode' : isSimulationRunning ? 'Auto Mode' : 'Stopped'}
-                    </span>
-                    
-                    {/* Desktop Mode Buttons */}
-                    <Button 
+              {/* Manual Input Section - Replaces simulation panel on mobile */}
+              {showManualInput ? (
+                <div className="glass-card rounded-2xl p-4 md:p-6 border-l-4 border-yellow-500">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-base md:text-lg font-semibold text-yellow-400 flex items-center gap-2">
+                      <Settings className="w-4 h-4 md:w-5 md:h-5" />
+                      Manual Analysis
+                    </h3>
+                    <Button
                       onClick={handleAutoMode}
-                      variant={!showManualInput && isSimulationRunning ? "default" : "outline"}
-                      size="sm"
-                    >
-                      <Play className="w-4 h-4" />
-                      Auto Mode
-                    </Button>
-                    
-                    <Button
-                      onClick={handleManualMode}
-                      variant={showManualInput ? "default" : "outline"}
-                      size="sm"
-                      className="border-yellow-400 text-yellow-400 hover:bg-yellow-400/10"
-                    >
-                      <Settings className="w-4 h-4" />
-                      Manual Mode
-                    </Button>
-
-                    <Button
-                      onClick={handleStopSimulation}
                       variant="outline"
                       size="sm"
-                      className="border-red-400 text-red-400 hover:bg-red-400/10"
+                      className="text-sm border-yellow-400 text-yellow-400 hover:bg-yellow-400/10"
                     >
-                      <Pause className="w-4 h-4" />
-                      Stop
+                      Back to Auto
+                    </Button>
+                  </div>
+                  <p className="text-xs md:text-sm text-gray-400 mb-4">
+                    Adjust voltage and temperature values
+                  </p>
+                  
+                  <div className="space-y-4 md:space-y-6">
+                    {/* Voltage Control */}
+                    <div className="space-y-2 md:space-y-3">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs md:text-sm font-medium text-gray-300 flex items-center gap-1 md:gap-2">
+                          <Zap className="w-3 h-3 md:w-4 md:h-4 text-cyan-400" />
+                          Voltage
+                        </label>
+                        <span className="text-cyan-400 font-mono text-base md:text-lg font-bold">{manualVoltage.toFixed(2)}V</span>
+                      </div>
+                      <div className="space-y-1 md:space-y-2">
+                        <input
+                          type="range"
+                          min="0"
+                          max="5"
+                          step="0.01"
+                          value={manualVoltage}
+                          onChange={(e) => setManualVoltage(parseFloat(e.target.value))}
+                          className="w-full h-2 md:h-3 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                          style={{
+                            background: getSliderBackground(manualVoltage, 0, 5, '#22d3ee')
+                          }}
+                        />
+                        <div className="flex justify-between text-[10px] md:text-xs text-gray-400">
+                          <span className="text-center">
+                            <div>0V</div>
+                          </span>
+                          <span className="text-center">
+                            <div>2.5V</div>
+                          </span>
+                          <span className="text-center">
+                            <div>3.3V</div>
+                          </span>
+                          <span className="text-center">
+                            <div>5V</div>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Temperature Control */}
+                    <div className="space-y-2 md:space-y-3">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs md:text-sm font-medium text-gray-300 flex items-center gap-1 md:gap-2">
+                          <Thermometer className="w-3 h-3 md:w-4 md:h-4 text-red-400" />
+                          Temperature
+                        </label>
+                        <span className="text-red-400 font-mono text-base md:text-lg font-bold">{manualTemperature}°C</span>
+                      </div>
+                      <div className="space-y-1 md:space-y-2">
+                        <input
+                          type="range"
+                          min="-20"
+                          max="120"
+                          step="1"
+                          value={manualTemperature}
+                          onChange={(e) => setManualTemperature(parseInt(e.target.value))}
+                          className="w-full h-2 md:h-3 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                          style={{
+                            background: getSliderBackground(manualTemperature, -20, 120, '#f87171')
+                          }}
+                        />
+                        <div className="flex justify-between text-[10px] md:text-xs text-gray-400">
+                          <span className="text-center">
+                            <div>-20°C</div>
+                          </span>
+                          <span className="text-center">
+                            <div>25°C</div>
+                          </span>
+                          <span className="text-center">
+                            <div>45°C</div>
+                          </span>
+                          <span className="text-center">
+                            <div>80°C</div>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2 md:gap-3 mt-4 md:mt-6">
+                    <Button
+                      onClick={handleAnalyze}
+                      className="bg-yellow-500 hover:bg-yellow-600 text-white flex-1 text-sm"
+                    >
+                      Analyze
                     </Button>
                   </div>
                 </div>
-                
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-                  <div className="space-y-2 col-span-2 md:col-span-1">
-                    <label className="text-sm font-medium text-gray-300">Analysis Mode</label>
-                    <select 
-                      value={simulationScenario}
-                      onChange={(e) => setSimulationScenario(e.target.value)}
-                      disabled={showManualInput}
-                      className="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"
-                    >
-                      <option value="normal">Normal Operation</option>
-                      <option value="overheating">Overheating Analysis</option>
-                      <option value="voltage_drop">Voltage Analysis</option>
-                      <option value="broken_trace">Hardware Fault Analysis</option>
-                      <option value="random">Random Analysis</option>
-                    </select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-300">Connection</label>
-                    <div className="flex gap-1 md:gap-2">
-                      <Button
-                        variant={currentReading?.connection_mode === 'Wi-Fi' ? "default" : "outline"}
+              ) : (
+                /* Simulation Control Panel - Only shown when NOT in manual mode */
+                <div className="glass-card rounded-2xl p-4 md:p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg md:text-xl font-semibold text-white">Hardware Analysis</h2>
+                    <div className="hidden md:flex items-center gap-3">
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        isSimulationRunning 
+                          ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                          : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                      }`}>
+                        {isSimulationRunning ? 'Auto Mode' : 'Stopped'}
+                      </span>
+                      
+                      {/* Desktop Mode Buttons */}
+                      <Button 
+                        onClick={handleAutoMode}
+                        variant={isSimulationRunning ? "default" : "outline"}
                         size="sm"
-                        onClick={() => refresh('Wi-Fi')}
-                        disabled={showManualInput}
-                        className="text-xs"
                       >
-                        Wi-Fi
+                        <Play className="w-4 h-4" />
+                        Auto Mode
                       </Button>
+                      
                       <Button
-                        variant={currentReading?.connection_mode === 'BLE' ? "default" : "outline"}
+                        onClick={handleManualMode}
+                        variant="outline"
                         size="sm"
-                        onClick={() => refresh('BLE')}
-                        disabled={showManualInput}
-                        className="text-xs"
+                        className="border-yellow-400 text-yellow-400 hover:bg-yellow-400/10"
                       >
-                        BLE
+                        <Settings className="w-4 h-4" />
+                        Manual Mode
+                      </Button>
+
+                      <Button
+                        onClick={handleStopSimulation}
+                        variant="outline"
+                        size="sm"
+                        className="border-red-400 text-red-400 hover:bg-red-400/10"
+                      >
+                        <Pause className="w-4 h-4" />
+                        Stop
                       </Button>
                     </div>
                   </div>
                   
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-300">Status</label>
-                    <div className={`text-sm md:text-lg font-semibold ${
-                      currentReading?.fault_status === 'Normal' ? 'text-green-400' :
-                      currentReading?.fault_status === 'Voltage Drop' ? 'text-yellow-400' :
-                      currentReading?.fault_status === 'Overheated' ? 'text-orange-400' :
-                      currentReading?.fault_status === 'Broken Trace' ? 'text-red-400' : 'text-gray-400'
-                    }`}>
-                      {getSafeFaultStatus()}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                    <div className="space-y-2 col-span-2 md:col-span-1">
+                      <label className="text-sm font-medium text-gray-300">Analysis Mode</label>
+                      <select 
+                        value={simulationScenario}
+                        onChange={(e) => setSimulationScenario(e.target.value)}
+                        className="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                      >
+                        <option value="normal">Normal Operation</option>
+                        <option value="overheating">Overheating Analysis</option>
+                        <option value="voltage_drop">Voltage Analysis</option>
+                        <option value="broken_trace">Hardware Fault Analysis</option>
+                        <option value="random">Random Analysis</option>
+                      </select>
                     </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-300">Data Points</label>
-                    <div className="text-sm md:text-lg font-semibold text-cyan-400">
-                      {Array.isArray(historicalData) ? historicalData.length : 0}
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-300">Connection</label>
+                      <div className="flex gap-1 md:gap-2">
+                        <Button
+                          variant={currentReading?.connection_mode === 'Wi-Fi' ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => refresh('Wi-Fi')}
+                          className="text-xs"
+                        >
+                          Wi-Fi
+                        </Button>
+                        <Button
+                          variant={currentReading?.connection_mode === 'BLE' ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => refresh('BLE')}
+                          className="text-xs"
+                        >
+                          BLE
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-300">Status</label>
+                      <div className={`text-sm md:text-lg font-semibold ${
+                        currentReading?.fault_status === 'Normal' ? 'text-green-400' :
+                        currentReading?.fault_status === 'Voltage Drop' ? 'text-yellow-400' :
+                        currentReading?.fault_status === 'Overheated' ? 'text-orange-400' :
+                        currentReading?.fault_status === 'Broken Trace' ? 'text-red-400' : 'text-gray-400'
+                      }`}>
+                        {getSafeFaultStatus()}
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-300">Data Points</label>
+                      <div className="text-sm md:text-lg font-semibold text-cyan-400">
+                        {Array.isArray(historicalData) ? historicalData.length : 0}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Mobile Gauges - Stacked vertically */}
               <div className="block md:hidden space-y-4">
@@ -441,115 +548,6 @@ const Dashboard = () => {
 
             {/* Right Side - Hardware Analysis Panel */}
             <div className="space-y-4 md:space-y-6">
-              {/* Manual Input Section */}
-              {showManualInput && (
-                <div className="glass-card rounded-2xl p-4 md:p-6 border-l-4 border-yellow-500">
-                  <h3 className="text-base md:text-lg font-semibold text-yellow-400 mb-3 md:mb-4 flex items-center gap-2">
-                    <Settings className="w-4 h-4 md:w-5 md:h-5" />
-                    Manual Analysis
-                  </h3>
-                  <p className="text-xs md:text-sm text-gray-400 mb-3 md:mb-4">
-                    Adjust voltage and temperature values
-                  </p>
-                  
-                  <div className="space-y-4 md:space-y-6">
-                    {/* Voltage Control */}
-                    <div className="space-y-2 md:space-y-3">
-                      <div className="flex items-center justify-between">
-                        <label className="text-xs md:text-sm font-medium text-gray-300 flex items-center gap-1 md:gap-2">
-                          <Zap className="w-3 h-3 md:w-4 md:h-4 text-cyan-400" />
-                          Voltage
-                        </label>
-                        <span className="text-cyan-400 font-mono text-base md:text-lg font-bold">{manualVoltage.toFixed(2)}V</span>
-                      </div>
-                      <div className="space-y-1 md:space-y-2">
-                        <input
-                          type="range"
-                          min="0"
-                          max="5"
-                          step="0.01"
-                          value={manualVoltage}
-                          onChange={(e) => setManualVoltage(parseFloat(e.target.value))}
-                          className="w-full h-2 md:h-3 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                          style={{
-                            background: getSliderBackground(manualVoltage, 0, 5, '#22d3ee')
-                          }}
-                        />
-                        <div className="flex justify-between text-[10px] md:text-xs text-gray-400">
-                          <span className="text-center">
-                            <div>0V</div>
-                          </span>
-                          <span className="text-center">
-                            <div>2.5V</div>
-                          </span>
-                          <span className="text-center">
-                            <div>3.3V</div>
-                          </span>
-                          <span className="text-center">
-                            <div>5V</div>
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Temperature Control */}
-                    <div className="space-y-2 md:space-y-3">
-                      <div className="flex items-center justify-between">
-                        <label className="text-xs md:text-sm font-medium text-gray-300 flex items-center gap-1 md:gap-2">
-                          <Thermometer className="w-3 h-3 md:w-4 md:h-4 text-red-400" />
-                          Temperature
-                        </label>
-                        <span className="text-red-400 font-mono text-base md:text-lg font-bold">{manualTemperature}°C</span>
-                      </div>
-                      <div className="space-y-1 md:space-y-2">
-                        <input
-                          type="range"
-                          min="-20"
-                          max="120"
-                          step="1"
-                          value={manualTemperature}
-                          onChange={(e) => setManualTemperature(parseInt(e.target.value))}
-                          className="w-full h-2 md:h-3 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                          style={{
-                            background: getSliderBackground(manualTemperature, -20, 120, '#f87171')
-                          }}
-                        />
-                        <div className="flex justify-between text-[10px] md:text-xs text-gray-400">
-                          <span className="text-center">
-                            <div>-20°C</div>
-                          </span>
-                          <span className="text-center">
-                            <div>25°C</div>
-                          </span>
-                          <span className="text-center">
-                            <div>45°C</div>
-                          </span>
-                          <span className="text-center">
-                            <div>80°C</div>
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-2 md:gap-3 mt-4 md:mt-6">
-                    <Button
-                      onClick={handleAnalyze}
-                      className="bg-yellow-500 hover:bg-yellow-600 text-white flex-1 text-sm"
-                    >
-                      Analyze
-                    </Button>
-                    <Button
-                      onClick={handleAutoMode}
-                      variant="outline"
-                      className="text-sm"
-                    >
-                      Auto
-                    </Button>
-                  </div>
-                </div>
-              )}
-
               {/* AI Advisor */}
               {aiAnalysis && (
                 <AIAdvisor 

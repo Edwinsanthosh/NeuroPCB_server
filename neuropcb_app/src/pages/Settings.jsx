@@ -22,10 +22,14 @@ import { Button, Input, Label, Switch } from '../components/ui-components';
 import { toast } from 'sonner';
 import { Navigation } from '../components/layout-component';
 
+const cn = (...classes) => {
+  return classes.filter(Boolean).join(' ');
+};
+
 // Card component since it's not in ui-components
 const Card = ({ children, className = '', ...props }) => (
   <div 
-    className={`glass-card rounded-3xl p-6 border border-gray-700/50 ${className}`}
+    className={`glass-card rounded-2xl md:rounded-3xl p-4 md:p-6 border border-gray-700/50 ${className}`}
     {...props}
   >
     {children}
@@ -317,7 +321,7 @@ const Settings = () => {
 
     return (
       <div className="flex items-center gap-1">
-        <Battery className={`w-4 h-4 ${getBatteryColor(level)}`} />
+        <Battery className={`w-3 h-3 md:w-4 md:h-4 ${getBatteryColor(level)}`} />
         <span className={`text-xs ${getBatteryColor(level)}`}>{level}%</span>
       </div>
     );
@@ -327,56 +331,68 @@ const Settings = () => {
     <>
       <Navigation />
       <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-950 p-4 md:p-8 pb-24 md:pb-8 md:pt-24">
-        <div className="max-w-6xl mx-auto space-y-8">
+        <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
+          {/* Header */}
+          <div className="text-center">
+            <div className="inline-flex items-center gap-3 bg-gray-800/50 border border-gray-700 rounded-2xl px-4 md:px-6 py-3 md:py-4">
+              <SettingsIcon className="w-6 h-6 md:w-8 md:h-8 text-green-400" />
+              <div className="text-left">
+                <h1 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent">
+                  Settings
+                </h1>
+                <p className="text-gray-400 text-sm md:text-base">Configure your Self Healing PCB system</p>
+              </div>
+            </div>
+          </div>
 
           {/* Main Grid Layout */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 md:gap-8">
             {/* Left Column - Connection Settings */}
-            <div className="xl:col-span-2 space-y-8">
+            <div className="xl:col-span-2 space-y-6 md:space-y-8">
               {/* Server Configuration */}
-              <Card className="p-8">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="p-3 bg-green-500/10 rounded-2xl">
-                    <Server className="w-6 h-6 text-green-400" />
+              <Card className="p-4 md:p-8">
+                <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
+                  <div className="p-2 md:p-3 bg-green-500/10 rounded-xl md:rounded-2xl">
+                    <Server className="w-5 h-5 md:w-6 md:h-6 text-green-400" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-white">Server Configuration</h2>
-                    <p className="text-gray-400">Configure your backend server settings</p>
+                    <h2 className="text-xl md:text-2xl font-bold text-white">Server Configuration</h2>
+                    <p className="text-gray-400 text-sm md:text-base">Configure your backend server settings</p>
                   </div>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-4 md:space-y-6">
                   <div>
-                    <Label htmlFor="api-url" className="text-white text-lg font-semibold">
+                    <Label htmlFor="api-url" className="text-white text-base md:text-lg font-semibold">
                       Backend API URL
                     </Label>
-                    <div className="flex gap-3 mt-3">
+                    <div className="flex flex-col md:flex-row gap-3 mt-2 md:mt-3">
                       <Input
                         id="api-url"
                         value={apiUrl}
                         onChange={(e) => setApiUrl(e.target.value)}
-                        className="flex-1 text-lg py-3 px-4 border-2 border-gray-600 focus:border-green-400 transition-colors"
+                        className="flex-1 text-base md:text-lg py-2 md:py-3 px-3 md:px-4 border-2 border-gray-600 focus:border-green-400 transition-colors"
                         placeholder="https://neuropcb-server.onrender.com"
                       />
-                      <Button className="bg-green-500 hover:bg-green-600 text-white px-6">
+                      <Button className="bg-green-500 hover:bg-green-600 text-white px-4 md:px-6 py-2 md:py-3">
                         Test
                       </Button>
                     </div>
-                    <p className="text-sm text-gray-400 mt-2">
-                      Enter the URL of your NeuroPCB backend server for real-time data processing
+                    <p className="text-xs md:text-sm text-gray-400 mt-1 md:mt-2">
+                      Enter the URL of your Self Healing PCB backend server
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="p-5 rounded-2xl bg-gray-800/50 border border-gray-700">
-                      <div className="flex items-center gap-3 mb-3">
-                        <Database className="w-5 h-5 text-cyan-400" />
-                        <h3 className="font-semibold text-white">Data Retention</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    <div className="p-3 md:p-5 rounded-xl md:rounded-2xl bg-gray-800/50 border border-gray-700">
+                      <div className="flex items-center gap-2 md:gap-3 mb-2 md:mb-3">
+                        <Database className="w-4 h-4 md:w-5 md:h-5 text-cyan-400" />
+                        <h3 className="font-semibold text-white text-sm md:text-base">Data Retention</h3>
                       </div>
-                      <div className="space-y-3">
+                      <div className="space-y-2 md:space-y-3">
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-400">Duration</span>
-                          <span className="text-white font-semibold">{dataRetention} days</span>
+                          <span className="text-gray-400 text-xs md:text-sm">Duration</span>
+                          <span className="text-white font-semibold text-sm md:text-base">{dataRetention} days</span>
                         </div>
                         <input
                           type="range"
@@ -389,17 +405,17 @@ const Settings = () => {
                       </div>
                     </div>
 
-                    <div className="p-5 rounded-2xl bg-gray-800/50 border border-gray-700">
-                      <div className="flex items-center gap-3 mb-3">
-                        <Shield className="w-5 h-5 text-green-400" />
-                        <h3 className="font-semibold text-white">Security</h3>
+                    <div className="p-3 md:p-5 rounded-xl md:rounded-2xl bg-gray-800/50 border border-gray-700">
+                      <div className="flex items-center gap-2 md:gap-3 mb-2 md:mb-3">
+                        <Shield className="w-4 h-4 md:w-5 md:h-5 text-green-400" />
+                        <h3 className="font-semibold text-white text-sm md:text-base">Security</h3>
                       </div>
                       <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center justify-between text-xs md:text-sm">
                           <span className="text-gray-400">SSL Enabled</span>
                           <span className="text-green-400">✅ Active</span>
                         </div>
-                        <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center justify-between text-xs md:text-sm">
                           <span className="text-gray-400">API Key</span>
                           <span className="text-cyan-400">🔑 Configured</span>
                         </div>
@@ -410,72 +426,72 @@ const Settings = () => {
               </Card>
 
               {/* Connection Methods */}
-              <Card className="p-8">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="p-3 bg-cyan-500/10 rounded-2xl">
-                    <Radio className="w-6 h-6 text-cyan-400" />
+              <Card className="p-4 md:p-8">
+                <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
+                  <div className="p-2 md:p-3 bg-cyan-500/10 rounded-xl md:rounded-2xl">
+                    <Radio className="w-5 h-5 md:w-6 md:h-6 text-cyan-400" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-white">Connection Methods</h2>
-                    <p className="text-gray-400">Choose how to connect to your hardware</p>
+                    <h2 className="text-xl md:text-2xl font-bold text-white">Connection Methods</h2>
+                    <p className="text-gray-400 text-sm md:text-base">Choose how to connect to your hardware</p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   {/* Connection Mode Selector */}
                   <div className="col-span-2">
-                    <div className="flex items-center justify-between p-6 rounded-2xl bg-gray-800/50 border-2 border-gray-600">
-                      <div className="flex items-center gap-4">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 md:p-6 rounded-xl md:rounded-2xl bg-gray-800/50 border-2 border-gray-600 gap-4 md:gap-0">
+                      <div className="flex items-center gap-3 md:gap-4">
                         {connectionMode === 'BLE' ? (
-                          <div className="p-3 bg-green-500/20 rounded-xl">
-                            <Bluetooth className="w-6 h-6 text-green-400" />
+                          <div className="p-2 md:p-3 bg-green-500/20 rounded-lg md:rounded-xl">
+                            <Bluetooth className="w-5 h-5 md:w-6 md:h-6 text-green-400" />
                           </div>
                         ) : (
-                          <div className="p-3 bg-cyan-500/20 rounded-xl">
-                            <Wifi className="w-6 h-6 text-cyan-400" />
+                          <div className="p-2 md:p-3 bg-cyan-500/20 rounded-lg md:rounded-xl">
+                            <Wifi className="w-5 h-5 md:w-6 md:h-6 text-cyan-400" />
                           </div>
                         )}
                         <div>
-                          <p className="font-semibold text-white text-lg">Connection Mode</p>
-                          <p className="text-gray-400">
+                          <p className="font-semibold text-white text-base md:text-lg">Connection Mode</p>
+                          <p className="text-gray-400 text-sm">
                             {connectionMode === 'BLE' ? 'Bluetooth Low Energy' : 'Wi-Fi Network'}
                           </p>
                         </div>
                       </div>
-                      <div className="flex gap-3">
+                      <div className="flex gap-2 md:gap-3 w-full md:w-auto">
                         <Button
                           variant={connectionMode === 'WiFi' ? 'default' : 'outline'}
-                          size="lg"
+                          size="sm"
                           onClick={() => setConnectionMode('WiFi')}
-                          className="px-6 py-3"
+                          className="flex-1 md:flex-none px-3 md:px-6 py-2 md:py-3"
                         >
-                          <Wifi className="w-4 h-4 mr-2" />
-                          Wi-Fi
+                          <Wifi className="w-4 h-4 mr-1 md:mr-2" />
+                          <span className="text-sm">Wi-Fi</span>
                         </Button>
                         <Button
                           variant={connectionMode === 'BLE' ? 'default' : 'outline'}
-                          size="lg"
+                          size="sm"
                           onClick={() => setConnectionMode('BLE')}
-                          className="px-6 py-3"
+                          className="flex-1 md:flex-none px-3 md:px-6 py-2 md:py-3"
                         >
-                          <Bluetooth className="w-4 h-4 mr-2" />
-                          BLE
+                          <Bluetooth className="w-4 h-4 mr-1 md:mr-2" />
+                          <span className="text-sm">BLE</span>
                         </Button>
                       </div>
                     </div>
                   </div>
 
                   {/* Connection Status */}
-                  <div className="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                     {/* BLE Status */}
-                    <div className="p-5 rounded-2xl bg-gray-800/30 border border-gray-700">
-                      <div className="flex items-center gap-3 mb-4">
-                        <Bluetooth className="w-5 h-5 text-green-400" />
-                        <h3 className="font-semibold text-white">Bluetooth Status</h3>
+                    <div className="p-3 md:p-5 rounded-xl md:rounded-2xl bg-gray-800/30 border border-gray-700">
+                      <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                        <Bluetooth className="w-4 h-4 md:w-5 md:h-5 text-green-400" />
+                        <h3 className="font-semibold text-white text-sm md:text-base">Bluetooth Status</h3>
                       </div>
-                      <div className="space-y-3">
+                      <div className="space-y-2 md:space-y-3">
                         <div className="flex justify-between items-center">
-                          <span className="text-gray-400">Available</span>
+                          <span className="text-gray-400 text-xs md:text-sm">Available</span>
                           <span className={`px-2 py-1 rounded text-xs ${
                             isWebBluetoothAvailable() 
                               ? 'bg-green-500/20 text-green-400' 
@@ -485,7 +501,7 @@ const Settings = () => {
                           </span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-gray-400">Connected</span>
+                          <span className="text-gray-400 text-xs md:text-sm">Connected</span>
                           <span className={`px-2 py-1 rounded text-xs ${
                             connectedBleDevice 
                               ? 'bg-green-500/20 text-green-400' 
@@ -498,20 +514,20 @@ const Settings = () => {
                     </div>
 
                     {/* Wi-Fi Status */}
-                    <div className="p-5 rounded-2xl bg-gray-800/30 border border-gray-700">
-                      <div className="flex items-center gap-3 mb-4">
-                        <Wifi className="w-5 h-5 text-cyan-400" />
-                        <h3 className="font-semibold text-white">Wi-Fi Status</h3>
+                    <div className="p-3 md:p-5 rounded-xl md:rounded-2xl bg-gray-800/30 border border-gray-700">
+                      <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                        <Wifi className="w-4 h-4 md:w-5 md:h-5 text-cyan-400" />
+                        <h3 className="font-semibold text-white text-sm md:text-base">Wi-Fi Status</h3>
                       </div>
-                      <div className="space-y-3">
+                      <div className="space-y-2 md:space-y-3">
                         <div className="flex justify-between items-center">
-                          <span className="text-gray-400">Available</span>
+                          <span className="text-gray-400 text-xs md:text-sm">Available</span>
                           <span className="px-2 py-1 rounded text-xs bg-green-500/20 text-green-400">
                             Ready
                           </span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-gray-400">Connected</span>
+                          <span className="text-gray-400 text-xs md:text-sm">Connected</span>
                           <span className={`px-2 py-1 rounded text-xs ${
                             connectedWifi 
                               ? 'bg-green-500/20 text-green-400' 
@@ -528,31 +544,31 @@ const Settings = () => {
             </div>
 
             {/* Right Column - Device Management & AI Settings */}
-            <div className="space-y-8">
+            <div className="space-y-6 md:space-y-8">
               {/* AI Settings */}
               <Card>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 bg-purple-500/10 rounded-xl">
-                    <Zap className="w-5 h-5 text-purple-400" />
+                <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
+                  <div className="p-1 md:p-2 bg-purple-500/10 rounded-lg md:rounded-xl">
+                    <Zap className="w-4 h-4 md:w-5 md:h-5 text-purple-400" />
                   </div>
-                  <h2 className="text-xl font-bold text-white">AI & Intelligence</h2>
+                  <h2 className="text-lg md:text-xl font-bold text-white">AI & Intelligence</h2>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 rounded-xl bg-gray-800/50 border border-gray-700">
+                <div className="space-y-3 md:space-y-4">
+                  <div className="flex items-center justify-between p-3 md:p-4 rounded-lg md:rounded-xl bg-gray-800/50 border border-gray-700">
                     <div>
-                      <p className="font-semibold text-white">AI Diagnostics</p>
-                      <p className="text-sm text-gray-400">Real-time fault analysis</p>
+                      <p className="font-semibold text-white text-sm md:text-base">AI Diagnostics</p>
+                      <p className="text-gray-400 text-xs md:text-sm">Real-time fault analysis</p>
                     </div>
                     <Switch checked={aiEnabled} onChange={setAiEnabled} />
                   </div>
 
-                  <div className="flex items-center justify-between p-4 rounded-xl bg-gray-800/50 border border-gray-700">
-                    <div className="flex items-center gap-3">
-                      <Bell className="w-4 h-4 text-green-400" />
+                  <div className="flex items-center justify-between p-3 md:p-4 rounded-lg md:rounded-xl bg-gray-800/50 border border-gray-700">
+                    <div className="flex items-center gap-2 md:gap-3">
+                      <Bell className="w-3 h-3 md:w-4 md:h-4 text-green-400" />
                       <div>
-                        <p className="font-semibold text-white">Notifications</p>
-                        <p className="text-sm text-gray-400">Alerts & warnings</p>
+                        <p className="font-semibold text-white text-sm md:text-base">Notifications</p>
+                        <p className="text-gray-400 text-xs md:text-sm">Alerts & warnings</p>
                       </div>
                     </div>
                     <Switch checked={notificationsEnabled} onChange={setNotificationsEnabled} />
@@ -562,18 +578,18 @@ const Settings = () => {
 
               {/* Quick Actions */}
               <Card>
-                <h2 className="text-xl font-bold text-white mb-6">Quick Actions</h2>
-                <div className="grid grid-cols-2 gap-4">
+                <h2 className="text-lg md:text-xl font-bold text-white mb-4 md:mb-6">Quick Actions</h2>
+                <div className="grid grid-cols-2 gap-3 md:gap-4">
                   <Button
                     onClick={scanBLEDevices}
                     disabled={isScanningBLE}
                     variant="outline"
-                    className="h-14 border-green-400 text-green-400 hover:bg-green-400/10"
+                    className="h-12 md:h-14 border-green-400 text-green-400 hover:bg-green-400/10 text-xs md:text-sm"
                   >
                     {isScanningBLE ? (
-                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <RefreshCw className="w-3 h-3 md:w-4 md:h-4 animate-spin" />
                     ) : (
-                      <Bluetooth className="w-4 h-4" />
+                      <Bluetooth className="w-3 h-3 md:w-4 md:h-4" />
                     )}
                     Scan BLE
                   </Button>
@@ -581,42 +597,42 @@ const Settings = () => {
                     onClick={scanWifiNetworks}
                     disabled={isScanningWifi}
                     variant="outline"
-                    className="h-14 border-cyan-400 text-cyan-400 hover:bg-cyan-400/10"
+                    className="h-12 md:h-14 border-cyan-400 text-cyan-400 hover:bg-cyan-400/10 text-xs md:text-sm"
                   >
                     {isScanningWifi ? (
-                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <RefreshCw className="w-3 h-3 md:w-4 md:h-4 animate-spin" />
                     ) : (
-                      <Wifi className="w-4 h-4" />
+                      <Wifi className="w-3 h-3 md:w-4 md:h-4" />
                     )}
                     Scan Wi-Fi
                   </Button>
                   <Button
                     variant="outline"
-                    className="h-14 border-purple-400 text-purple-400 hover:bg-purple-400/10"
+                    className="h-12 md:h-14 border-purple-400 text-purple-400 hover:bg-purple-400/10 text-xs md:text-sm"
                   >
-                    <Database className="w-4 h-4" />
+                    <Database className="w-3 h-3 md:w-4 md:h-4" />
                     Export Data
                   </Button>
                   <Button
                     variant="outline"
-                    className="h-14 border-yellow-400 text-yellow-400 hover:bg-yellow-400/10"
+                    className="h-12 md:h-14 border-yellow-400 text-yellow-400 hover:bg-yellow-400/10 text-xs md:text-sm"
                   >
-                    <Shield className="w-4 h-4" />
+                    <Shield className="w-3 h-3 md:w-4 md:h-4" />
                     Security
                   </Button>
                 </div>
               </Card>
 
               {/* System Info */}
-              <div className="glass-card rounded-3xl p-6 border border-cyan-400/20 bg-cyan-400/5">
-                <div className="flex items-center gap-3 mb-4">
-                  <Smartphone className="w-5 h-5 text-cyan-400" />
-                  <h2 className="text-xl font-bold text-white">System Ready</h2>
+              <div className="glass-card rounded-2xl md:rounded-3xl p-4 md:p-6 border border-cyan-400/20 bg-cyan-400/5">
+                <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                  <Smartphone className="w-4 h-4 md:w-5 md:h-5 text-cyan-400" />
+                  <h2 className="text-lg md:text-xl font-bold text-white">System Ready</h2>
                 </div>
-                <p className="text-sm text-cyan-300 mb-4">
+                <p className="text-cyan-300 text-xs md:text-sm mb-3 md:mb-4">
                   All systems operational. Ready for hardware connections and real-time monitoring.
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1 md:gap-2">
                   <span className="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs">Web Bluetooth</span>
                   <span className="bg-cyan-500/20 text-cyan-400 px-2 py-1 rounded text-xs">Wi-Fi Ready</span>
                   <span className="bg-purple-500/20 text-purple-400 px-2 py-1 rounded text-xs">AI Active</span>
@@ -626,34 +642,34 @@ const Settings = () => {
           </div>
 
           {/* Device Lists */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
             {/* BLE Devices */}
             <Card>
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <Bluetooth className="w-5 h-5 text-green-400" />
-                  <h2 className="text-xl font-bold text-white">Bluetooth Devices</h2>
+              <div className="flex items-center justify-between mb-4 md:mb-6">
+                <div className="flex items-center gap-2 md:gap-3">
+                  <Bluetooth className="w-4 h-4 md:w-5 md:h-5 text-green-400" />
+                  <h2 className="text-lg md:text-xl font-bold text-white">Bluetooth Devices</h2>
                 </div>
-                <span className="text-sm text-gray-400">{bleDevices.length} found</span>
+                <span className="text-xs md:text-sm text-gray-400">{bleDevices.length} found</span>
               </div>
 
               <div className="space-y-3 max-h-80 overflow-y-auto">
                 {bleDevices.map((device) => (
                   <div
                     key={device.id}
-                    className={`p-4 rounded-2xl border-2 transition-all duration-200 ${
+                    className={`p-3 md:p-4 rounded-xl md:rounded-2xl border-2 transition-all duration-200 ${
                       device.connected
                         ? 'bg-green-500/10 border-green-400/30'
                         : 'bg-gray-800/30 border-gray-600/50 hover:border-gray-500'
                     }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Cpu className="w-5 h-5 text-cyan-400" />
-                        <div>
-                          <p className="font-semibold text-white">{device.name}</p>
-                          <div className="flex items-center gap-3 text-xs text-gray-400">
-                            <span>{device.type}</span>
+                    <div className="flex items-center justify-between gap-2 md:gap-3">
+                      <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+                        <Cpu className="w-4 h-4 md:w-5 md:h-5 text-cyan-400 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <p className="font-semibold text-white text-sm md:text-base truncate">{device.name}</p>
+                          <div className="flex items-center gap-1 md:gap-2 text-xs text-gray-400 flex-wrap">
+                            <span className="truncate">{device.type}</span>
                             <span>•</span>
                             <SignalStrength strength={Math.abs(device.rssi)} />
                             <span>{device.rssi} dBm</span>
@@ -667,27 +683,31 @@ const Settings = () => {
                         disabled={isConnecting}
                         size="sm"
                         variant={device.connected ? "default" : "outline"}
-                        className={device.connected 
-                          ? "bg-green-500 hover:bg-green-600" 
-                          : "border-green-400 text-green-400 hover:bg-green-400/10"
-                        }
+                        className={cn(
+                          "flex-shrink-0",
+                          device.connected 
+                            ? "bg-green-500 hover:bg-green-600" 
+                            : "border-green-400 text-green-400 hover:bg-green-400/10"
+                        )}
                       >
                         {device.connected ? (
-                          <Unlink className="w-4 h-4" />
+                          <Unlink className="w-3 h-3 md:w-4 md:h-4" />
                         ) : (
-                          <Link className="w-4 h-4" />
+                          <Link className="w-3 h-3 md:w-4 md:h-4" />
                         )}
-                        {device.connected ? 'Connected' : 'Connect'}
+                        <span className="hidden md:inline ml-1">
+                          {device.connected ? 'Connected' : 'Connect'}
+                        </span>
                       </Button>
                     </div>
                   </div>
                 ))}
                 
                 {bleDevices.length === 0 && !isScanningBLE && (
-                  <div className="text-center py-8 text-gray-400">
-                    <Bluetooth className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                    <p>No BLE devices found</p>
-                    <p className="text-sm">Click "Scan BLE" to discover nearby devices</p>
+                  <div className="text-center py-6 md:py-8 text-gray-400">
+                    <Bluetooth className="w-8 h-8 md:w-12 md:h-12 mx-auto mb-2 md:mb-3 opacity-50" />
+                    <p className="text-sm">No BLE devices found</p>
+                    <p className="text-xs md:text-sm mt-1">Click "Scan BLE" to discover nearby devices</p>
                   </div>
                 )}
               </div>
@@ -695,35 +715,35 @@ const Settings = () => {
 
             {/* Wi-Fi Networks */}
             <Card>
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <Wifi className="w-5 h-5 text-cyan-400" />
-                  <h2 className="text-xl font-bold text-white">Wi-Fi Networks</h2>
+              <div className="flex items-center justify-between mb-4 md:mb-6">
+                <div className="flex items-center gap-2 md:gap-3">
+                  <Wifi className="w-4 h-4 md:w-5 md:h-5 text-cyan-400" />
+                  <h2 className="text-lg md:text-xl font-bold text-white">Wi-Fi Networks</h2>
                 </div>
-                <span className="text-sm text-gray-400">{wifiNetworks.length} found</span>
+                <span className="text-xs md:text-sm text-gray-400">{wifiNetworks.length} found</span>
               </div>
 
               <div className="space-y-3 max-h-80 overflow-y-auto">
                 {wifiNetworks.map((network) => (
                   <div
                     key={network.id}
-                    className={`p-4 rounded-2xl border-2 transition-all duration-200 ${
+                    className={`p-3 md:p-4 rounded-xl md:rounded-2xl border-2 transition-all duration-200 ${
                       network.connected
                         ? 'bg-cyan-500/10 border-cyan-400/30'
                         : 'bg-gray-800/30 border-gray-600/50 hover:border-gray-500'
                     }`}
                   >
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Wifi className="w-5 h-5 text-cyan-400" />
-                          <div>
-                            <p className="font-semibold text-white">{network.ssid}</p>
-                            <div className="flex items-center gap-3 text-xs text-gray-400">
+                    <div className="space-y-2 md:space-y-3">
+                      <div className="flex items-center justify-between gap-2 md:gap-3">
+                        <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+                          <Wifi className="w-4 h-4 md:w-5 md:h-5 text-cyan-400 flex-shrink-0" />
+                          <div className="min-w-0 flex-1">
+                            <p className="font-semibold text-white text-sm md:text-base truncate">{network.ssid}</p>
+                            <div className="flex items-center gap-1 md:gap-2 text-xs text-gray-400 flex-wrap">
                               <SignalStrength strength={network.signal} />
                               <span>{network.signal}% signal</span>
                               <span>•</span>
-                              <span>{network.frequency}</span>
+                              <span className="truncate">{network.frequency}</span>
                               <span>•</span>
                               <span>{network.secured ? '🔒 Secured' : '🌐 Open'}</span>
                             </div>
@@ -734,17 +754,21 @@ const Settings = () => {
                           disabled={isConnecting}
                           size="sm"
                           variant={network.connected ? "default" : "outline"}
-                          className={network.connected 
-                            ? "bg-cyan-500 hover:bg-cyan-600" 
-                            : "border-cyan-400 text-cyan-400 hover:bg-cyan-400/10"
-                          }
+                          className={cn(
+                            "flex-shrink-0",
+                            network.connected 
+                              ? "bg-cyan-500 hover:bg-cyan-600" 
+                              : "border-cyan-400 text-cyan-400 hover:bg-cyan-400/10"
+                          )}
                         >
                           {network.connected ? (
-                            <Unlink className="w-4 h-4" />
+                            <Unlink className="w-3 h-3 md:w-4 md:h-4" />
                           ) : (
-                            <Link className="w-4 h-4" />
+                            <Link className="w-3 h-3 md:w-4 md:h-4" />
                           )}
-                          {network.connected ? 'Connected' : 'Connect'}
+                          <span className="hidden md:inline ml-1">
+                            {network.connected ? 'Connected' : 'Connect'}
+                          </span>
                         </Button>
                       </div>
                       
@@ -755,7 +779,7 @@ const Settings = () => {
                             placeholder="Enter Wi-Fi password"
                             value={wifiPassword}
                             onChange={(e) => setWifiPassword(e.target.value)}
-                            className="flex-1 text-sm"
+                            className="flex-1 text-xs md:text-sm"
                           />
                         </div>
                       )}
@@ -764,10 +788,10 @@ const Settings = () => {
                 ))}
                 
                 {wifiNetworks.length === 0 && !isScanningWifi && (
-                  <div className="text-center py-8 text-gray-400">
-                    <Wifi className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                    <p>No Wi-Fi networks found</p>
-                    <p className="text-sm">Click "Scan Wi-Fi" to discover available networks</p>
+                  <div className="text-center py-6 md:py-8 text-gray-400">
+                    <Wifi className="w-8 h-8 md:w-12 md:h-12 mx-auto mb-2 md:mb-3 opacity-50" />
+                    <p className="text-sm">No Wi-Fi networks found</p>
+                    <p className="text-xs md:text-sm mt-1">Click "Scan Wi-Fi" to discover available networks</p>
                   </div>
                 )}
               </div>
@@ -775,16 +799,16 @@ const Settings = () => {
           </div>
 
           {/* Save Section */}
-          <Card className="p-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-bold text-white">Apply Changes</h3>
-                <p className="text-gray-400">Save your configuration settings</p>
+          <Card className="p-4 md:p-8">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
+              <div className="text-center md:text-left">
+                <h3 className="text-lg md:text-xl font-bold text-white">Apply Changes</h3>
+                <p className="text-gray-400 text-sm">Save your configuration settings</p>
               </div>
               <Button 
                 onClick={handleSave} 
                 size="lg" 
-                className="bg-gradient-to-r from-green-500 to-cyan-500 hover:from-green-600 hover:to-cyan-600 text-white px-8 py-3"
+                className="bg-gradient-to-r from-green-500 to-cyan-500 hover:from-green-600 hover:to-cyan-600 text-white px-6 md:px-8 py-2 md:py-3 w-full md:w-auto"
               >
                 Save Settings
               </Button>

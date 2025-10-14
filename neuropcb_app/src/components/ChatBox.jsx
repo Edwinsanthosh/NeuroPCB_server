@@ -49,7 +49,7 @@ export const ChatBox = ({
       setMessages([
         {
           id: 1,
-          text: "Hello! I'm your NeuroPCB AI Assistant. I can help you with:\n\n• Hardware connection details\n• Real-time sensor readings\n• Fault diagnosis and solutions\n• System troubleshooting\n• Performance optimization\n\nWhat would you like to know about your PCB system?",
+          text: "Hello! I'm your Self Healing PCB AI Assistant. I can help you with:\n\n• Hardware connection details\n• Real-time sensor readings\n• Fault diagnosis and solutions\n• System troubleshooting\n• Performance optimization\n\nWhat would you like to know about your PCB system?",
           isBot: true,
           timestamp: new Date()
         }
@@ -65,6 +65,72 @@ export const ChatBox = ({
     "Temperature troubleshooting",
     "System optimization tips"
   ];
+
+  // AI Model for matching user input with existing solutions
+  const matchUserInput = (userMessage) => {
+    const lowerMessage = userMessage.toLowerCase();
+    
+    // Define patterns and their corresponding responses
+    const patterns = [
+      {
+        keywords: ['status', 'how is', 'current', 'what\'s happening', 'system health'],
+        response: 'system_status'
+      },
+      {
+        keywords: ['connection', 'hardware', 'details', 'connect', 'wifi', 'bluetooth', 'ble'],
+        response: 'connection_details'
+      },
+      {
+        keywords: ['diagnose', 'fault', 'problem', 'issue', 'error', 'wrong', 'broken'],
+        response: 'diagnose_faults'
+      },
+      {
+        keywords: ['voltage', 'power', 'battery', 'vcc', '3.3v', '5v'],
+        response: 'voltage_analysis'
+      },
+      {
+        keywords: ['temperature', 'heat', 'hot', 'cool', 'thermal', '°c', 'celsius'],
+        response: 'temperature_analysis'
+      },
+      {
+        keywords: ['fix', 'solution', 'repair', 'resolve', 'troubleshoot'],
+        response: 'fix_solutions'
+      },
+      {
+        keywords: ['optimize', 'improve', 'better', 'enhance', 'performance', 'efficient'],
+        response: 'optimization_tips'
+      },
+      {
+        keywords: ['refresh', 'update', 'reload', 'sync'],
+        response: 'refresh_data'
+      },
+      {
+        keywords: ['simulation', 'scenario', 'mode', 'test'],
+        response: 'simulation_control'
+      }
+    ];
+
+    // Calculate match score for each pattern
+    const matches = patterns.map(pattern => {
+      const score = pattern.keywords.reduce((total, keyword) => {
+        return total + (lowerMessage.includes(keyword) ? 1 : 0);
+      }, 0);
+      
+      return {
+        response: pattern.response,
+        score: score,
+        confidence: score / pattern.keywords.length
+      };
+    });
+
+    // Find the best match
+    const bestMatch = matches.reduce((best, current) => {
+      return current.score > best.score ? current : best;
+    }, { score: 0, confidence: 0, response: null });
+
+    // Return best match if confidence is high enough, otherwise use default
+    return bestMatch.confidence > 0.3 ? bestMatch.response : 'general_help';
+  };
 
   const getSystemStatus = () => {
     const status = hardwareDetails.faultStatus;
@@ -227,32 +293,41 @@ export const ChatBox = ({
     setInputMessage('');
     setIsLoading(true);
 
-    // Simulate AI response
+    // Simulate AI response with pattern matching
     setTimeout(() => {
       let response = '';
+      const matchedResponse = matchUserInput(message);
       
-      const lowerMessage = message.toLowerCase();
+      // Add context about what the AI understood
+      let contextNote = `\n\n💡 *I detected you're asking about ${matchedResponse.replace('_', ' ')}*`;
 
-      if (lowerMessage.includes('status') || lowerMessage.includes('how is') || lowerMessage.includes('current')) {
-        response = `${getSystemStatus()}\n\n${getConnectionDetails()}`;
-      }
-      else if (lowerMessage.includes('connection') || lowerMessage.includes('hardware') || lowerMessage.includes('details')) {
-        response = getConnectionDetails();
-      }
-      else if (lowerMessage.includes('diagnose') || lowerMessage.includes('fault') || lowerMessage.includes('problem') || lowerMessage.includes('issue')) {
-        response = `**Diagnosis Report:**\n\n${getSystemStatus()}\n\n${getFaultSolutions(hardwareDetails.faultStatus)}`;
-      }
-      else if (lowerMessage.includes('voltage') || lowerMessage.includes('power')) {
-        response = `**Voltage Analysis:**\n\nCurrent: ${hardwareDetails.currentVoltage.toFixed(2)}V\n\n${getFaultSolutions('Voltage Drop')}`;
-      }
-      else if (lowerMessage.includes('temperature') || lowerMessage.includes('heat') || lowerMessage.includes('hot')) {
-        response = `**Temperature Analysis:**\n\nCurrent: ${hardwareDetails.currentTemperature.toFixed(1)}°C\n\n${getFaultSolutions('Overheated')}`;
-      }
-      else if (lowerMessage.includes('fix') || lowerMessage.includes('solution') || lowerMessage.includes('repair')) {
-        response = getFaultSolutions(hardwareDetails.faultStatus);
-      }
-      else if (lowerMessage.includes('optimize') || lowerMessage.includes('improve') || lowerMessage.includes('better')) {
-        response = `
+      switch (matchedResponse) {
+        case 'system_status':
+          response = `${getSystemStatus()}\n\n${getConnectionDetails()}${contextNote}`;
+          break;
+          
+        case 'connection_details':
+          response = `${getConnectionDetails()}${contextNote}`;
+          break;
+          
+        case 'diagnose_faults':
+          response = `**Diagnosis Report:**\n\n${getSystemStatus()}\n\n${getFaultSolutions(hardwareDetails.faultStatus)}${contextNote}`;
+          break;
+          
+        case 'voltage_analysis':
+          response = `**Voltage Analysis:**\n\nCurrent: ${hardwareDetails.currentVoltage.toFixed(2)}V\n\n${getFaultSolutions('Voltage Drop')}${contextNote}`;
+          break;
+          
+        case 'temperature_analysis':
+          response = `**Temperature Analysis:**\n\nCurrent: ${hardwareDetails.currentTemperature.toFixed(1)}°C\n\n${getFaultSolutions('Overheated')}${contextNote}`;
+          break;
+          
+        case 'fix_solutions':
+          response = `${getFaultSolutions(hardwareDetails.faultStatus)}${contextNote}`;
+          break;
+          
+        case 'optimization_tips':
+          response = `
 **🚀 System Optimization Tips:**
 
 1. **Power Optimization**
@@ -274,29 +349,35 @@ export const ChatBox = ({
    • Implement predictive maintenance
    • Set up alert thresholds
    • Regular calibration checks
-        `;
-      }
-      else if (lowerMessage.includes('refresh') || lowerMessage.includes('update')) {
-        refreshData();
-        response = "🔄 Refreshing hardware data... Check the updated readings above.";
-      }
-      else if (lowerMessage.includes('simulation') || lowerMessage.includes('scenario')) {
-        if (lowerMessage.includes('overheat')) {
-          setSimulationScenario('overheating');
-          response = "🔥 Switching to overheating scenario...";
-        } else if (lowerMessage.includes('voltage')) {
-          setSimulationScenario('voltage_drop');
-          response = "⚡ Switching to voltage drop scenario...";
-        } else if (lowerMessage.includes('broken')) {
-          setSimulationScenario('broken_trace');
-          response = "🔧 Switching to broken trace scenario...";
-        } else {
-          setSimulationScenario('normal');
-          response = "✅ Switching to normal operation scenario...";
-        }
-      }
-      else {
-        response = "I understand you're asking about the PCB system. I can help you with:\n\n• Current system status and readings\n• Hardware connection details\n• Fault diagnosis and repair solutions\n• System optimization tips\n• Simulation control\n\nTry asking about specific issues like voltage problems, overheating, or connection status.";
+          ${contextNote}`;
+          break;
+          
+        case 'refresh_data':
+          refreshData();
+          response = "🔄 Refreshing hardware data... Check the updated readings above.";
+          break;
+          
+        case 'simulation_control':
+          const lowerMessage = message.toLowerCase();
+          if (lowerMessage.includes('overheat')) {
+            setSimulationScenario('overheating');
+            response = "🔥 Switching to overheating scenario...";
+          } else if (lowerMessage.includes('voltage')) {
+            setSimulationScenario('voltage_drop');
+            response = "⚡ Switching to voltage drop scenario...";
+          } else if (lowerMessage.includes('broken')) {
+            setSimulationScenario('broken_trace');
+            response = "🔧 Switching to broken trace scenario...";
+          } else {
+            setSimulationScenario('normal');
+            response = "✅ Switching to normal operation scenario...";
+          }
+          response += contextNote;
+          break;
+          
+        default:
+          response = `I understand you're asking about the PCB system. I can help you with:\n\n• Current system status and readings\n• Hardware connection details\n• Fault diagnosis and repair solutions\n• System optimization tips\n• Simulation control\n\nTry asking about specific issues like voltage problems, overheating, or connection status.\n\n💡 *Try using more specific keywords like "voltage", "temperature", or "connection" for better assistance.*`;
+          break;
       }
 
       const botMessage = {
@@ -333,8 +414,8 @@ export const ChatBox = ({
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
             <div>
-              <h3 className="font-semibold text-white">NeuroPCB AI Assistant</h3>
-              <p className="text-xs text-gray-400">Hardware Diagnostics & Support</p>
+              <h3 className="font-semibold text-white">Self Healing PCB AI Assistant</h3>
+              <p className="text-xs text-gray-400">Intelligent Hardware Diagnostics & Support</p>
             </div>
           </div>
           <Button
@@ -395,6 +476,7 @@ export const ChatBox = ({
                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                   </div>
+                  <span className="text-xs text-gray-400 ml-2">Analyzing your query...</span>
                 </div>
               </div>
             </div>
