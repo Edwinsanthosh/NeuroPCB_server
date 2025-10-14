@@ -2,39 +2,71 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { apiService } from '../services/apiService';
 import { toast } from '../components/ui-components';
 
-// Enhanced mock data generator with scenarios
-const generateMockReading = (scenario = 'normal', connectionMode = 'Wi-Fi') => {
+// Hardware status analyzer based on voltage and temperature
+const analyzeHardwareStatus = (voltage, temperature) => {
+  let fault_status = 'Normal';
+  let severity = 'low';
+  
+  // Voltage analysis
+  const voltageStatus = 
+    voltage >= 3.0 ? 'normal' :
+    voltage >= 2.8 ? 'low' :
+    voltage >= 2.5 ? 'very_low' : 'critical';
+  
+  // Temperature analysis
+  const tempStatus = 
+    temperature <= 45 ? 'normal' :
+    temperature <= 60 ? 'high' :
+    temperature <= 80 ? 'very_high' : 'critical';
+  
+  // Determine overall fault status
+  if (voltageStatus === 'critical' && tempStatus === 'critical') {
+    fault_status = 'Broken Trace';
+    severity = 'high';
+  } else if (tempStatus === 'critical' || tempStatus === 'very_high') {
+    fault_status = 'Overheated';
+    severity = tempStatus === 'critical' ? 'high' : 'medium';
+  } else if (voltageStatus === 'critical' || voltageStatus === 'very_low') {
+    fault_status = 'Voltage Drop';
+    severity = voltageStatus === 'critical' ? 'high' : 'medium';
+  } else if (voltageStatus === 'low' || tempStatus === 'high') {
+    fault_status = 'Normal';
+    severity = 'low';
+  }
+  
+  return { fault_status, severity };
+};
+
+// Enhanced mock data generator with analysis
+const generateMockReading = (scenario = 'normal', connectionMode = 'Wi-Fi', manualVoltage = null, manualTemperature = null) => {
   const scenarios = {
-    normal: [
-      { voltage: 3.3 + (Math.random() * 0.2 - 0.1), temp: 25 + Math.random() * 5, fault: 'Normal' },
-      { voltage: 3.2 + (Math.random() * 0.2 - 0.1), temp: 28 + Math.random() * 5, fault: 'Normal' },
-    ],
-    overheating: [
-      { voltage: 3.1 + (Math.random() * 0.1), temp: 65 + Math.random() * 10, fault: 'Overheated' },
-      { voltage: 3.0 + (Math.random() * 0.1), temp: 70 + Math.random() * 8, fault: 'Overheated' },
-    ],
-    voltage_drop: [
-      { voltage: 2.7 + Math.random() * 0.1, temp: 30 + Math.random() * 5, fault: 'Voltage Drop' },
-      { voltage: 2.6 + Math.random() * 0.1, temp: 32 + Math.random() * 5, fault: 'Voltage Drop' },
-    ],
-    broken_trace: [
-      { voltage: 2.5 + Math.random() * 0.2, temp: 35 + Math.random() * 10, fault: 'Broken Trace' },
-      { voltage: 2.4 + Math.random() * 0.2, temp: 38 + Math.random() * 10, fault: 'Broken Trace' },
-    ],
-    random: [
-      { voltage: 2.5 + Math.random() * 1.0, temp: 20 + Math.random() * 50, fault: ['Normal', 'Voltage Drop', 'Overheated', 'Broken Trace'][Math.floor(Math.random() * 4)] },
-    ]
+    normal: { voltage: 3.3, temp: 35 },
+    overheating: { voltage: 3.1, temp: 75 },
+    voltage_drop: { voltage: 2.6, temp: 32 },
+    broken_trace: { voltage: 2.3, temp: 85 },
+    random: { 
+      voltage: 2.5 + Math.random() * 1.0, 
+      temp: 20 + Math.random() * 50 
+    }
   };
 
   const scenarioData = scenarios[scenario] || scenarios.normal;
-  const dataPoint = scenarioData[Math.floor(Math.random() * scenarioData.length)];
+  
+  // Use manual inputs if provided, otherwise use scenario data with some variation
+  const voltage = manualVoltage !== null ? manualVoltage : 
+    scenarioData.voltage + (Math.random() * 0.4 - 0.2);
+  const temperature = manualTemperature !== null ? manualTemperature : 
+    scenarioData.temp + (Math.random() * 10 - 5);
+  
+  const analysis = analyzeHardwareStatus(voltage, temperature);
   
   return {
-    voltage: Number(dataPoint.voltage.toFixed(2)),
-    temperature: Number(dataPoint.temp.toFixed(1)),
-    fault_status: dataPoint.fault,
+    voltage: Number(voltage.toFixed(2)),
+    temperature: Number(temperature.toFixed(1)),
+    fault_status: analysis.fault_status,
     connection_mode: connectionMode,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    severity: analysis.severity
   };
 };
 
@@ -46,6 +78,8 @@ export const useDataSync = () => {
   const [isSimulationRunning, setIsSimulationRunning] = useState(true);
   const [simulationScenario, setSimulationScenario] = useState('normal');
   const [connectionMode, setConnectionMode] = useState('Wi-Fi');
+  const [manualVoltage, setManualVoltage] = useState(3.3);
+  const [manualTemperature, setManualTemperature] = useState(25);
   
   // Use refs to track toast states without causing re-renders
   const toastState = useRef({
@@ -54,6 +88,86 @@ export const useDataSync = () => {
     lastSeverity: null,
     lastToastTime: 0
   });
+
+  const analyzeHardwareStatusCallback = useCallback((voltage, temperature) => {
+    const analysis = analyzeHardwareStatus(voltage, temperature);
+    
+    const reading = {
+      voltage: Number(voltage.toFixed(2)),
+      temperature: Number(temperature.toFixed(1)),
+      fault_status: analysis.fault_status,
+      connection_mode: connectionMode,
+      timestamp: new Date().toISOString(),
+      severity: analysis.severity
+    };
+    
+    setCurrentReading(reading);
+    
+    setHistoricalData(prev => {
+      const newData = [...prev, {
+        time: new Date().toLocaleTimeString(),
+        voltage: reading.voltage,
+        temperature: reading.temperature,
+        fault_status: reading.fault_status
+      }];
+      // Keep only last 20 readings
+      return newData.slice(-20);
+    });
+    
+    // Generate AI analysis based on the status
+    const aiSuggestion = generateAISuggestion(reading);
+    setAiAnalysis(aiSuggestion);
+    
+    // Show appropriate toast
+    const now = Date.now();
+    if (analysis.severity !== toastState.current.lastSeverity && 
+        (now - toastState.current.lastToastTime > 3000)) {
+      
+      if (analysis.severity === 'high') {
+        toast.error('🚨 Critical Hardware Fault!', {
+          description: `Detected: ${reading.fault_status}`,
+          duration: 10000,
+        });
+      } else if (analysis.severity === 'medium') {
+        toast.warning('⚠️ Hardware Warning', {
+          description: `Issue: ${reading.fault_status}`,
+          duration: 7000,
+        });
+      }
+      
+      toastState.current.lastSeverity = analysis.severity;
+      toastState.current.lastToastTime = now;
+    }
+    
+    return reading;
+  }, [connectionMode]);
+
+  const generateAISuggestion = (reading) => {
+    const suggestions = {
+      'Normal': {
+        ai_suggestion: 'System operating within normal parameters. Continue regular monitoring.',
+        severity: 'low'
+      },
+      'Voltage Drop': {
+        ai_suggestion: reading.voltage < 2.5 
+          ? 'Critical voltage drop detected! Check power supply, traces, and components immediately.'
+          : 'Moderate voltage drop detected. Inspect power supply and check for loose connections.',
+        severity: reading.voltage < 2.5 ? 'high' : 'medium'
+      },
+      'Overheated': {
+        ai_suggestion: reading.temperature > 80
+          ? 'Critical overheating! Power down immediately and inspect cooling systems.'
+          : 'High temperature detected. Improve ventilation and check for cooling system issues.',
+        severity: reading.temperature > 80 ? 'high' : 'medium'
+      },
+      'Broken Trace': {
+        ai_suggestion: 'Hardware fault detected. Perform visual inspection and continuity testing of PCB traces.',
+        severity: 'high'
+      }
+    };
+    
+    return suggestions[reading.fault_status] || suggestions['Normal'];
+  };
 
   const fetchData = useCallback(async (newConnectionMode = null) => {
     if (!isSimulationRunning) return;
@@ -87,8 +201,8 @@ export const useDataSync = () => {
         
         // Show mock data toast only once
         if (!toastState.current.hasShownDemo) {
-          toast.info('Hardware Simulation Active', {
-            description: 'Using simulated sensor data - Connect real hardware for live monitoring',
+          toast.info('Hardware Analysis Mode Active', {
+            description: 'Analyzing hardware status based on input parameters',
           });
           toastState.current.hasShownDemo = true;
         }
@@ -107,34 +221,8 @@ export const useDataSync = () => {
         return newData.slice(-20);
       });
       
-      const analysis = await apiService.getAIAnalysis(data);
+      const analysis = generateAISuggestion(data);
       setAiAnalysis(analysis);
-      
-      // Prevent toast spam - only show if severity changed and enough time passed
-      const now = Date.now();
-      if (analysis.severity !== toastState.current.lastSeverity && 
-          (now - toastState.current.lastToastTime > 3000)) {
-        
-        if (analysis.severity === 'high') {
-          toast.error('🚨 Critical Fault Detected!', {
-            description: analysis.ai_suggestion,
-            duration: 10000,
-          });
-        } else if (analysis.severity === 'medium') {
-          toast.warning('⚠️ System Warning', {
-            description: analysis.ai_suggestion,
-            duration: 7000,
-          });
-        } else if (analysis.severity === 'low' && toastState.current.lastSeverity === 'high') {
-          toast.success('✅ System Normal', {
-            description: 'All parameters returned to safe levels',
-            duration: 5000,
-          });
-        }
-        
-        toastState.current.lastSeverity = analysis.severity;
-        toastState.current.lastToastTime = now;
-      }
       
     } catch (error) {
       console.error('Data sync error:', error);
@@ -152,12 +240,12 @@ export const useDataSync = () => {
     
     // Use toast.info for simulation status
     if (newState) {
-      toast.info('Simulation Started', {
-        description: 'Receiving simulated sensor data',
+      toast.info('Auto Analysis Mode', {
+        description: 'Automatically analyzing hardware scenarios',
       });
     } else {
-      toast.info('Simulation Paused', {
-        description: 'Data updates paused',
+      toast.info('Manual Analysis Mode', {
+        description: 'Ready for manual hardware input',
       });
     }
   }, [isSimulationRunning]);
@@ -198,6 +286,11 @@ export const useDataSync = () => {
     toggleSimulation,
     simulationScenario,
     setSimulationScenario,
+    manualVoltage,
+    setManualVoltage,
+    manualTemperature,
+    setManualTemperature,
+    analyzeHardwareStatus: analyzeHardwareStatusCallback,
     refresh
   };
 };
