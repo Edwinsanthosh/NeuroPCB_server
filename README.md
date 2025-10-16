@@ -1,7 +1,3 @@
-Perfect, Edwin ⚡ Here’s a clean, professional **README.md** for your `NeuroPCB-AI` project — suitable for GitHub and freelancing portfolios.
-It includes setup, features, tech stack, and deployment details 👇
-
----
 
 ## 🧠 NeuroPCB-AI — Intelligent PCB Fault Detection & Self-Healing System
 
